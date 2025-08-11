@@ -21,8 +21,8 @@ export async function selectPhone(): Promise<{ phone: string; apiKey: string } |
     try {
       const numbers = await client.whatsapp.getWhatsappNumbers();
 
-      if (!numbers || numbers.data.length === 0) {
-        console.log("No WhatsApp numbers found for this account.");
+      if (!numbers.success) {
+        console.log("❌ Invalid API key or no numbers found. Please try again.\n");
         return null;
       }
 
@@ -41,8 +41,9 @@ export async function selectPhone(): Promise<{ phone: string; apiKey: string } |
       ]);
 
       phone = selectedPhone;
-    } catch (error: any) {
-      console.log("❌ Invalid API key or request failed. Please try again.\n");
+    } catch {
+      // No mostramos el error real del SDK
+      console.log("❌ Could not connect to Wasapi. Check your API key and try again.\n");
     }
   }
 

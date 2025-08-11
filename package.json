@@ -25,7 +25,7 @@
     "ora": "^8.2.0",
     "qrcode-terminal": "^0.12.0",
     "simple-git": "^3.28.0",
-    "wasapi-sdk": "^0.1.7"
+    "wasapi-sdk": "^0.1.8"
   },
   "devDependencies": {
     "@types/node": "^24.2.1",
