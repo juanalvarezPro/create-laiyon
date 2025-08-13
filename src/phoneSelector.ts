@@ -1,5 +1,5 @@
 import inquirer from "inquirer";
-import { WasapiClient } from "wasapi-sdk";
+import { WasapiClient } from "@laiyon/wasapi-sdk";
 
 async function connectWasapi(): Promise<{ apiKey: string; connected: boolean }> {
   let attempts = 0;

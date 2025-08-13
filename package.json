@@ -1,7 +1,7 @@
 {
-  "name": "create-wasabot",
+  "name": "create-laiyon",
   "version": "1.0.0",
-  "description": "CLI para crear proyectos de Wasabot",
+  "description": "CLI para crear proyectos de laiyon con wasapi",
   "type": "module",
   "scripts": {
     "build": "tsc"
@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@laiyon/wasapi-sdk": "^0.1.14",
     "@types/fs-extra": "^11.0.4",
     "@types/qrcode-terminal": "^0.12.2",
     "chalk": "^5.5.0",
@@ -24,8 +25,7 @@
     "node-fetch": "^3.3.2",
     "ora": "^8.2.0",
     "qrcode-terminal": "^0.12.0",
-    "simple-git": "^3.28.0",
-    "wasapi-sdk": "^0.1.9"
+    "simple-git": "^3.28.0"
   },
   "devDependencies": {
     "@types/node": "^24.2.1",
