@@ -7,7 +7,7 @@
     "build": "tsc"
   },
   "bin": {
-    "create-wasabot": "./bin/cli.js"
+    "create-laiyon": "./bin/cli.js"
   },
   "keywords": [],
   "author": "",
