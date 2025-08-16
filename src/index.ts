@@ -5,9 +5,10 @@ import { setupEnv } from "./setupEnv.js";
 import { installTemplate } from "./templates/templateInstaller.js";
 import { validateTemplate} from "./templates/templateConfig.js";
 import { selectPhone } from "./services/phoneSelector.js";
-import { detectSystemConfig } from "./utils/systemDetector.js";
+import { detectSystemConfig, setupNgrokToken } from "./utils/systemDetector.js";
 import { startDevServerWithNgrok } from "./services/devServer.js";
 import { showManualInstructions } from "./ui/instructions.js";
+import { askForGitHubStar } from "./ui/githubStar.js";
 import ora from "ora";
 
 async function main() {
@@ -30,7 +31,6 @@ async function main() {
     spinner.succeed("✅ Template installed correctly");
 
     console.log(`\n🔧 Configuring environment variables...`);
-    console.log("   Setting up Wasapi connection");
     
     const selectedPhone = await selectPhone();
     if (!selectedPhone) {
@@ -47,21 +47,32 @@ async function main() {
     });
 
     // Detect system configuration
-    const { isMac, hasNgrok } = await detectSystemConfig();
+    const systemConfig = await detectSystemConfig();
 
-    // Ask user if they want automatic setup (only if available)
-    const wantsAutoSetup = await askForAutomaticSetup(isMac, hasNgrok);
+    // Ask user if they want automatic setup (only if ngrok is available)
+    let canAutoSetup = systemConfig.canAutoSetup;
+    
+    // If ngrok is installed but no token, offer to configure it
+    if (systemConfig.ngrokInstalled && !systemConfig.ngrokHasToken) {
+      const tokenConfigured = await setupNgrokToken();
+      canAutoSetup = tokenConfigured;
+    }
+    
+    const wantsAutoSetup = await askForAutomaticSetup(canAutoSetup);
 
-    if (isMac && hasNgrok && wantsAutoSetup) {
+    if (canAutoSetup && wantsAutoSetup) {
       console.log("\n🚀 Starting automatic setup...");
       console.log("🔧 Installing packages and starting development server...");
       await startDevServerWithNgrok(answers.projectName, phoneNumber);
     } else {
-      if (isMac && hasNgrok && !wantsAutoSetup) {
+      if (canAutoSetup && !wantsAutoSetup) {
         console.log("\n👤 User chose manual setup");
       }
-      await showManualInstructions(answers.projectName, isMac, hasNgrok);
+      await showManualInstructions(answers.projectName, systemConfig);
     }
+
+    // Ask for GitHub star at the end
+    await askForGitHubStar();
     
   } catch (error) {
     console.error(`\n❌ Error during project creation: ${error}`);
