@@ -1,6 +1,6 @@
 {
   "name": "@laiyon/create-wasapi",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI to create WhatsApp bot projects with Wasapi and BuilderBot",
   "type": "module",
   "scripts": {
