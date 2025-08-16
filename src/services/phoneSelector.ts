@@ -9,9 +9,10 @@ async function connectWasapi(): Promise<{ apiKey: string; connected: boolean }> 
   while (attempts < 2 && !connected) {
     const { enteredKey } = await inquirer.prompt([
       {
-        type: "input",
+        type: "password",
         name: "enteredKey",
-        message: "Enter your Wasapi API key:"
+        message: "Enter your Wasapi API key:",
+        mask: "*"
       }
     ]);
 
