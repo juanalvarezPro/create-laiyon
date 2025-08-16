@@ -38,11 +38,10 @@
     "url": "https://github.com/juanalvarezPro/create-laiyon/issues"
   },
   "files": [
-    "dist/**/*",
-    "bin/**/*",
-    "starters/**/*",
-    "README.md",
-    "LICENSE"
+    "dist/",
+    "bin/",
+    "starters/",
+    "README.md"
   ],
   "dependencies": {
     "@laiyon/wasapi-sdk": "^0.1.14",
