@@ -1,13 +1,16 @@
 {
-  "name": "create-laiyon",
+  "name": "@laiyon/create-wasapi",
   "version": "1.0.0",
   "description": "CLI para crear proyectos de laiyon con wasapi",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "bin": {
-    "create-laiyon": "./bin/cli.js"
+    "create-wasapi": "./bin/cli.js"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +31,10 @@
     "simple-git": "^3.28.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.2.1",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }
