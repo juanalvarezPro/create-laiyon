@@ -6,7 +6,7 @@ import { MemoryDB as Database } from '@builderbot/bot'
 dotenv.config();
 
 // Environment variables configuration
-const port = process.env.PORT ?? '4000';
+const port = process.env.PORT || 4000;
 const token = process.env.API_KEY
 const deviceId = process.env.PHONE_ID
 
