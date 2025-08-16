@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { runPrompts } from "./ui/prompts.js";
+import { runPrompts, askForAutomaticSetup } from "./ui/prompts.js";
 import { setupEnv } from "./setupEnv.js";
 import { installTemplate } from "./templates/templateInstaller.js";
 import { validateTemplate} from "./templates/templateConfig.js";
@@ -44,11 +44,17 @@ async function main() {
     // Detect system configuration
     const { isMac, hasNgrok } = await detectSystemConfig();
 
-    if (isMac && hasNgrok) {
-      console.log("\n🚀 Automatic configuration enabled!");
+    // Ask user if they want automatic setup (only if available)
+    const wantsAutoSetup = await askForAutomaticSetup(isMac, hasNgrok);
+
+    if (isMac && hasNgrok && wantsAutoSetup) {
+      console.log("\n🚀 Starting automatic setup...");
       console.log("🔧 Installing packages and starting development server...");
       await startDevServerWithNgrok(answers.projectName, phoneNumber);
     } else {
+      if (isMac && hasNgrok && !wantsAutoSetup) {
+        console.log("\n👤 User chose manual setup");
+      }
       await showManualInstructions(answers.projectName, isMac, hasNgrok);
     }
     

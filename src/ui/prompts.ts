@@ -38,3 +38,20 @@ export async function runPrompts() {
         }
     ]);
 }
+
+export async function askForAutomaticSetup(isMac: boolean, hasNgrok: boolean): Promise<boolean> {
+    if (!isMac || !hasNgrok) {
+        return false; // Can't do automatic setup
+    }
+
+    const { autoSetup } = await inquirer.prompt([
+        {
+            type: "confirm",
+            name: "autoSetup",
+            message: "🚀 Automatic setup is available! Would you like to:\n   • Install packages automatically\n   • Start development server\n   • Create ngrok tunnel\n   • Generate WhatsApp test QR\n   \n   Proceed with automatic setup?",
+            default: true
+        }
+    ]);
+
+    return autoSetup;
+}

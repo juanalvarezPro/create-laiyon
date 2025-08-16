@@ -1,5 +1,36 @@
 import { startNgrok } from "./ngrokService.js";
 import { getFreePort } from "../utils/portUtils.js";
+import { promises as fs } from "fs";
+
+// Function to update .env file with port
+async function updateEnvWithPort(projectName: string, port: number) {
+  const path = await import('path');
+  const envPath = path.join(process.cwd(), projectName, '.env');
+  
+  try {
+    // Read existing .env content
+    const envContent = await fs.readFile(envPath, 'utf-8');
+    
+    // Check if PORT already exists
+    const lines = envContent.split('\n');
+    const portLineIndex = lines.findIndex(line => line.startsWith('PORT='));
+    
+    if (portLineIndex !== -1) {
+      // Update existing PORT line
+      lines[portLineIndex] = `PORT=${port}`;
+    } else {
+      // Add new PORT line
+      lines.push(`PORT=${port}`);
+    }
+    
+    // Write updated content back to .env
+    await fs.writeFile(envPath, lines.join('\n'));
+    console.log(`✅ PORT=${port} saved to .env file`);
+    
+  } catch (error) {
+    console.warn(`⚠️ Warning: Could not update .env with port: ${error}`);
+  }
+}
 
 // Function to install packages and run server with ngrok
 export async function startDevServerWithNgrok(projectName: string, phoneNumber: string) {
@@ -16,6 +47,9 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
     // Find available port
     const port = await getFreePort(3000);
     console.log(`🚀 Starting development server on port ${port}...`);
+    
+    // Save port to .env file
+    await updateEnvWithPort(projectName, port);
     
     // Run npm run dev
     const devProcess = spawn('npm', ['run', 'dev'], {
