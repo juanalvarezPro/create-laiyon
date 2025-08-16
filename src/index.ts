@@ -66,7 +66,10 @@ async function main() {
       
       try {
         await startDevServerWithNgrok(answers.projectName, phoneNumber);
-        console.log("\n🎉 Setup completed successfully!");
+        // ✅ SUCCESS: Server is running with ngrok
+        // Don't show GitHub star or exit - let server run
+        return; // Exit main function, keep server alive
+        
       } catch (autoSetupError) {
         console.log("\n⚠️ Automatic setup failed, showing manual instructions:");
         await showManualInstructions(answers.projectName, systemConfig);
@@ -78,15 +81,22 @@ async function main() {
       await showManualInstructions(answers.projectName, systemConfig);
     }
 
-    // Ask for GitHub star at the end
+    // Ask for GitHub star at the end (only for manual setup)
     await askForGitHubStar();
     
     console.log("\n🎉 Congratulations! Your WhatsApp bot is ready!");
     console.log("Thank you for using create-laiyon");
     
+    // Exit cleanly to stop any background processes
+    setTimeout(() => {
+      process.exit(0);
+    }, 1000);
+    
   } catch (error) {
     console.error(`\n❌ Error during project creation: ${error}`);
-    process.exit(1);
+    setTimeout(() => {
+      process.exit(1);
+    }, 500);
   }
 }
 
