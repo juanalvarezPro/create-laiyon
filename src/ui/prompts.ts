@@ -19,19 +19,23 @@ export async function runPrompts() {
                 },
                 {
                     name: "Json",
-                    value: "base-ts-wasapi-json"
+                    value: "base-ts-wasapi-json",
+                    disabled: "(Coming Soon)"
                 },
                 {
-                    name: "Mongo",
-                    value: "base-ts-wasapi-mongo"
+                    name: "MongoDB",
+                    value: "base-ts-wasapi-mongo",
+                    disabled: "(Coming Soon)"
                 },
                 {
                     name: "MySQL",
-                    value: "base-ts-wasapi-mysql"
+                    value: "base-ts-wasapi-mysql", 
+                    disabled: "(Coming Soon)"
                 },
                 {
                     name: "PostgreSQL",
-                    value: "base-ts-wasapi-postgresql"
+                    value: "base-ts-wasapi-postgresql",
+                    disabled: "(Coming Soon)"
                 }
             ],
             default: "base-ts-wasapi-memory"
@@ -39,8 +43,8 @@ export async function runPrompts() {
     ]);
 }
 
-export async function askForAutomaticSetup(isMac: boolean, hasNgrok: boolean): Promise<boolean> {
-    if (!isMac || !hasNgrok) {
+export async function askForAutomaticSetup(canAutoSetup: boolean): Promise<boolean> {
+    if (!canAutoSetup) {
         return false; // Can't do automatic setup
     }
 
