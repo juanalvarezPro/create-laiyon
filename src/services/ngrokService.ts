@@ -29,9 +29,10 @@ export async function startNgrok(projectName: string, port?: number, phoneNumber
   } catch (error: any) {
     // Handle specific ngrok errors
     if (error.message?.includes('ECONNREFUSED')) {
-      throw new Error(`🚫 Ngrok free account limitation detected!\n\n💡 Free accounts allow only 1 tunnel at a time.\n\n📋 Solutions:\n   • Close other ngrok tunnels: pkill ngrok\n   • Or upgrade to Ngrok Pro for multiple tunnels\n   • Or use manual setup instead`);
+      throw new Error(`🚫 Ngrok limitation: Free accounts allow only 1 tunnel.\n💡 Close other tunnels: pkill ngrok`);
     } else {
       throw new Error(`Ngrok connection failed: ${error.message || error}`);
+
     }
   }
 }
