@@ -25,7 +25,6 @@ async function updateEnvWithPort(projectName: string, port: number) {
     
     // Write updated content back to .env
     await fs.writeFile(envPath, lines.join('\n'));
-    console.log(`✅ PORT=${port} saved to .env file`);
     
   } catch (error) {
     console.warn(`⚠️ Warning: Could not update .env with port: ${error}`);
@@ -46,7 +45,6 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
     
     // Find available port
     const port = await getFreePort(3000);
-    console.log(`🚀 Starting development server on port ${port}...`);
     
     // Save port to .env file
     await updateEnvWithPort(projectName, port);

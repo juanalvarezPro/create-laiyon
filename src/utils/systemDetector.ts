@@ -11,12 +11,8 @@ export async function checkNgrokInstalled(): Promise<boolean> {
 
 // Function to detect system configuration
 export async function detectSystemConfig() {
-  console.log("\n🔍 Detecting system configuration...");
   const isMac = process.platform === 'darwin';
   const hasNgrok = await checkNgrokInstalled();
-  
-  console.log(`   Operating system: ${isMac ? '🍎 macOS' : '💻 ' + process.platform}`);
-  console.log(`   Ngrok installed: ${hasNgrok ? '✅ Yes' : '❌ No'}`);
 
   return { isMac, hasNgrok };
 }
