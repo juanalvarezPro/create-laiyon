@@ -29,10 +29,14 @@ async function generateWaMeQR(phoneNumber: string) {
     const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
     
     // Generate wa.me link with predefined message
-    const waMeLink = `https://wa.me/${cleanPhoneNumber}?text=Hello`;
+    const waMeLink = `https://wa.me/${cleanPhoneNumber}?text=test`;
     
     console.log(`\n📱 Test your bot by scanning this QR:`);
     qrcode.generate(waMeLink, { small: true });
+    
+    console.log(`\n🔗 Or click this link directly:`);
+    console.log(`   ${waMeLink}`);
+    console.log(`\n💡 Tip: Ctrl+Click (Cmd+Click on Mac) to open in your browser`);
     
   } catch (error) {
     console.warn(`⚠️ Could not generate wa.me QR: ${error}`);
