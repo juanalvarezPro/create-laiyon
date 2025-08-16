@@ -6,6 +6,7 @@ import { installTemplate } from "./templates/templateInstaller.js";
 import { validateTemplate} from "./templates/templateConfig.js";
 import { selectPhone } from "./services/phoneSelector.js";
 import { detectSystemConfig, setupNgrokToken } from "./utils/systemDetector.js";
+import { checkNodeVersion } from "./utils/nodeVersionChecker.js";
 import { startDevServerWithNgrok } from "./services/devServer.js";
 import { showManualInstructions } from "./ui/instructions.js";
 import { askForGitHubStar } from "./ui/githubStar.js";
@@ -15,6 +16,9 @@ async function main() {
   try {
     // Show awesome banner
     showBanner();
+
+    // Check Node.js version first
+    checkNodeVersion();
     
     const answers = await runPrompts();
 
