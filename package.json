@@ -1,23 +1,49 @@
 {
   "name": "@laiyon/create-wasapi",
-  "version": "1.0.0",
-  "description": "CLI para crear proyectos de laiyon con wasapi",
+  "version": "1.0.1",
+  "description": "CLI to create WhatsApp bot projects with Wasapi and BuilderBot",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build && npm test"
   },
   "bin": {
     "create-wasapi": "./bin/cli.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "cli",
+    "wasapi",
+    "builderbot",
+    "ngrok",
+    "create",
+    "generator",
+    "typescript"
+  ],
+  "author": "Laiyon",
+  "license": "MIT",
   "engines": {
     "node": ">=18.0.0 <23.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juanalvarezPro/create-laiyon"
+  },
+  "homepage": "https://github.com/juanalvarezPro/create-laiyon",
+  "bugs": {
+    "url": "https://github.com/juanalvarezPro/create-laiyon/issues"
+  },
+  "files": [
+    "dist/**/*",
+    "bin/**/*",
+    "starters/**/*",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@laiyon/wasapi-sdk": "^0.1.14",
     "@types/fs-extra": "^11.0.4",
