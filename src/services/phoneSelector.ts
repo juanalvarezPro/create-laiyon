@@ -57,12 +57,15 @@ export async function selectPhone(): Promise<{ phone: string; phoneNumber: strin
     value: { id: num.id, phoneNumber: num.phone_number }
   }));
 
+  console.log("\n📱 Available phones:\n");
+  
   const { phoneData } = await inquirer.prompt([
     {
       type: "list",
       name: "phoneData",
       message: "Select the phone:",
-      choices
+      choices,
+      pageSize: 10
     }
   ]);
 

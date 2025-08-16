@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { runPrompts, askForAutomaticSetup } from "./ui/prompts.js";
+import { showBanner } from "./ui/banner.js";
 import { setupEnv } from "./setupEnv.js";
 import { installTemplate } from "./templates/templateInstaller.js";
 import { validateTemplate} from "./templates/templateConfig.js";
@@ -11,7 +12,8 @@ import ora from "ora";
 
 async function main() {
   try {
-    console.log("🚀 Welcome to create-wasabot CLI\n");
+    // Show awesome banner
+    showBanner();
     
     const answers = await runPrompts();
 
@@ -27,14 +29,17 @@ async function main() {
     await installTemplate(answers.projectName, answers.dbType);
     spinner.succeed("✅ Template installed correctly");
 
-    console.log(`\n🔧 Configuring environment variables......`);
+    console.log(`\n🔧 Configuring environment variables...`);
+    console.log("   Setting up Wasapi connection");
+    
     const selectedPhone = await selectPhone();
     if (!selectedPhone) {
-      console.error("❌ No phone selected");
+      console.error("\n❌ No phone selected");
       process.exit(1);
     }
     
     const { phone, phoneNumber, apiKey } = selectedPhone;
+    console.log(`\n✅ Phone selected: ${phoneNumber}`);
     
     await setupEnv(answers.projectName, {
       API_KEY: apiKey,
