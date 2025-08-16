@@ -84,9 +84,6 @@ async function main() {
     console.log("\n🎉 Congratulations! Your WhatsApp bot is ready!");
     console.log("Thank you for using create-laiyon");
     
-    // Exit cleanly
-    process.exit(0);
-    
   } catch (error) {
     console.error(`\n❌ Error during project creation: ${error}`);
     process.exit(1);
