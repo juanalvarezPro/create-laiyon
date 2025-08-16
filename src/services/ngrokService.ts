@@ -2,23 +2,42 @@ import ngrok from "ngrok";
 import qrcode from "qrcode-terminal";
 import { getFreePort } from "../utils/portUtils.js";
 
-export async function startNgrok(projectName: string, port?: number, phoneNumber?: string) {
-  const targetPort = port || await getFreePort(3000);
-  const url = await ngrok.connect({ addr: targetPort });
-  
-  // Generate webhook URL
-  const webhookUrl = `${url}/webhook/wasapi`;
-  
 
-  console.log(`🔗 Webhook URL: ${webhookUrl}`);
-  console.log(`   Use this URL in your Wasapi configuration`);
-  
-  // Generate wa.me QR if phone number is provided
-  if (phoneNumber) {
-    await generateWaMeQR(phoneNumber);
+
+export async function startNgrok(projectName: string, port?: number, phoneNumber?: string) {
+  try {
+    const targetPort = port || await getFreePort(3000);
+    
+    // Start ngrok directly - let it handle multiple tunnel limitations
+    
+    console.log(`🔌 Connecting ngrok to port ${targetPort}...`);
+    const url = await ngrok.connect({ addr: targetPort });
+    
+    // Generate webhook URL
+    const webhookUrl = `${url}/webhook/wasapi`;
+    
+    console.log(`🔗 Webhook URL: ${webhookUrl}`);
+    console.log(`   Use this URL in your Wasapi configuration`);
+    
+    // Generate wa.me QR if phone number is provided
+    if (phoneNumber) {
+      await generateWaMeQR(phoneNumber);
+    }
+    
+    return { url, webhookUrl };
+    
+  } catch (error: any) {
+    // Handle specific ngrok errors
+    if (error.message?.includes('ECONNREFUSED')) {
+      throw new Error(`Cannot connect to port ${port}. Server may not be running or port is not accessible.`);
+    } else if (error.message?.includes('tunnel session failed') || 
+               error.message?.includes('account limit') || 
+               error.message?.includes('Account limited to')) {
+      throw new Error(`🚫 Ngrok free account limitation detected!\n\n💡 Free accounts allow only 1 tunnel at a time.\n\n📋 Solutions:\n   • Close other ngrok tunnels: pkill ngrok\n   • Or upgrade to Ngrok Pro for multiple tunnels\n   • Or use manual setup instead`);
+    } else {
+      throw new Error(`Ngrok connection failed: ${error.message || error}`);
+    }
   }
-  
-  return { url, webhookUrl };
 }
 
 

@@ -2,6 +2,29 @@ import { startNgrok } from "./ngrokService.js";
 import { getFreePort } from "../utils/portUtils.js";
 import { promises as fs } from "fs";
 
+// Function to check if server is running on port
+async function waitForServer(port: number, maxAttempts: number = 10): Promise<boolean> {
+  const net = await import('net');
+  
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      await new Promise((resolve, reject) => {
+        const socket = net.connect(port, '127.0.0.1', () => {
+          socket.end();
+          resolve(true);
+        });
+        socket.on('error', reject);
+        setTimeout(() => reject(new Error('timeout')), 1000);
+      });
+      return true; // Server is responding
+    } catch {
+      // Wait 1 second before next attempt
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  return false; // Server didn't start after all attempts
+}
+
 // Function to update .env file with port
 async function updateEnvWithPort(projectName: string, port: number) {
   const path = await import('path');
@@ -45,6 +68,7 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
     
     // Find available port
     const port = await getFreePort(3000);
+    console.log(`🚀 Starting development server on port ${port}...`);
     
     // Save port to .env file
     await updateEnvWithPort(projectName, port);
@@ -56,11 +80,32 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
       env: { ...process.env, PORT: port.toString() }
     });
     
-    // Wait for the server to start
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Wait for the server to start and verify it's running
+    console.log("⏳ Waiting for server to start...");
+    const serverStarted = await waitForServer(port);
     
-    // Start ngrok
-    await startNgrok(projectName, port, phoneNumber);
+    if (!serverStarted) {
+      console.error(`❌ Server failed to start on port ${port}`);
+      devProcess.kill();
+      throw new Error("Development server failed to start");
+    }
+    
+    console.log(`✅ Server running on port ${port}`);
+    
+    // Start ngrok with timeout
+    console.log("🌐 Starting ngrok tunnel...");
+    try {
+      await Promise.race([
+        startNgrok(projectName, port, phoneNumber),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Ngrok timeout")), 30000)
+        )
+      ]);
+    } catch (ngrokError: any) {
+      console.error(`❌ Ngrok failed: ${ngrokError}`);
+      devProcess.kill();
+      throw ngrokError;
+    }
     
   } catch (error) {
     console.error(`❌ Error starting development server: ${error}`);

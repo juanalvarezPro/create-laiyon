@@ -63,7 +63,14 @@ async function main() {
     if (canAutoSetup && wantsAutoSetup) {
       console.log("\n🚀 Starting automatic setup...");
       console.log("🔧 Installing packages and starting development server...");
-      await startDevServerWithNgrok(answers.projectName, phoneNumber);
+      
+      try {
+        await startDevServerWithNgrok(answers.projectName, phoneNumber);
+        console.log("\n🎉 Setup completed successfully!");
+      } catch (autoSetupError) {
+        console.log("\n⚠️ Automatic setup failed, showing manual instructions:");
+        await showManualInstructions(answers.projectName, systemConfig);
+      }
     } else {
       if (canAutoSetup && !wantsAutoSetup) {
         console.log("\n👤 User chose manual setup");
@@ -73,6 +80,12 @@ async function main() {
 
     // Ask for GitHub star at the end
     await askForGitHubStar();
+    
+    console.log("\n🎉 Congratulations! Your WhatsApp bot is ready!");
+    console.log("Thank you for using create-laiyon");
+    
+    // Exit cleanly
+    process.exit(0);
     
   } catch (error) {
     console.error(`\n❌ Error during project creation: ${error}`);
