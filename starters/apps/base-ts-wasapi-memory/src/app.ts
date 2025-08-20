@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import { createBot, createFlow, createProvider, addKeyword} from '@builderbot/bot'
-import { WasapiProvider as  Provider } from "@laiyon/wasapi-provider";
+import { createBot, createFlow, createProvider, addKeyword } from '@builderbot/bot'
+import { WasapiProvider as Provider, WasapiEvents } from "@laiyon/wasapi-provider";
 import { MemoryDB as Database } from '@builderbot/bot'
 
 dotenv.config();
@@ -92,7 +92,7 @@ const flowInteractive = addKeyword<Provider, Database>(['demo', 'test', 'interac
     
     // Send an image example (replace with your actual image URL)
     await provider.sendAttachment(
-      ctx.from, 
+      ctx.from,
       'https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2154867048/settings_images/6e31fe3-6658-cd-3ef-ab73b68f244_5730e14d-d3d8-42dc-8943-dfbd8b6062a0.png',
       'This is an example of sending media files!',
       'Image'
@@ -116,36 +116,50 @@ const flowFallback = addKeyword<Provider, Database>([''])
 
 
 const main = async () => {
-    // Create flow with all conversation flows
-    const adapterFlow = createFlow([
-        flowWelcome,      // Main welcome and menu
-        flowServices,     // Services information
-        flowSupport,      // Support options
-        flowContact,      // Contact information
-        flowFAQ,          // Frequently asked questions
-        flowInteractive,  // Interactive demo with dynamic responses
-        flowFallback      // Handles unrecognized messages
-    ])
-    
-    // Ensure token and deviceId are defined
-    if (!token || !deviceId) {
-        throw new Error("The environment variables API_KEY and PHONE_ID must be defined.")
-    }
-    
-    // Create provider and database adapters
-    const adapterProvider = createProvider(Provider, { token, deviceId })
-    const adapterDB = new Database()
+  // Create flow with all conversation flows
+  const adapterFlow = createFlow([
+    flowWelcome,      // Main welcome and menu
+    flowServices,     // Services information
+    flowSupport,      // Support options
+    flowContact,      // Contact information
+    flowFAQ,          // Frequently asked questions
+    flowInteractive,  // Interactive demo with dynamic responses
+    flowFallback      // Handles unrecognized messages
+  ])
 
-    // Create and start the bot
-    const { httpServer } = await createBot({
-        flow: adapterFlow,
-        provider: adapterProvider,
-        database: adapterDB,
-    })
+  // Ensure token and deviceId are defined
+  if (!token || !deviceId) {
+    throw new Error("The environment variables API_KEY and PHONE_ID must be defined.")
+  }
 
-    // Start HTTP server
-    httpServer(Number(port))
-    console.log(`🤖 Laiyon Wasapi Bot started`)
+  // Create provider and database adapters
+  const adapterProvider = createProvider(Provider, { token, deviceId })
+  const adapterDB = new Database()
+
+  // CREATE WASAPI EVENTS INSTANCE TO INTERCEPT MESSAGES
+  const wasapiEvents = new WasapiEvents(token);
+
+  // Listen for message events
+  wasapiEvents.on('message', (message) => {
+    console.log('📨 [WASAPI] Incoming message:', {
+      from: message.from,
+      body: message.body,
+      name: message.name,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Create and start the bot
+  const { httpServer } = await createBot({
+    flow: adapterFlow,
+    provider: adapterProvider,
+    database: adapterDB,
+  })
+
+  // Start HTTP server
+  httpServer(Number(port))
+  console.log(`🤖 Laiyon Wasapi Bot started`)
+  console.log('📡 [WASAPI] Provider listening for events...')
 }
 
 main()
