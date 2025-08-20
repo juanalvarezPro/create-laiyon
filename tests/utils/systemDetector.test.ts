@@ -1,5 +1,14 @@
 import { checkNgrokInstalled, detectSystemConfig } from '../../src/utils/systemDetector';
 
+// Mock chalk
+jest.mock('chalk', () => ({
+  __esModule: true,
+  default: {
+    bgGray: { white: jest.fn((str) => str) },
+    blue: jest.fn((str) => str),
+  },
+}));
+
 // Mock child_process
 const mockExecSync = jest.fn();
 jest.mock('child_process', () => ({
