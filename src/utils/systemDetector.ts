@@ -3,14 +3,22 @@ export async function checkNgrokInstalled(): Promise<{ installed: boolean; hasTo
   try {
     const { execSync } = await import('child_process');
     
-    // Check if ngrok command exists (cross-platform)
+    // First check if ngrok command exists (cross-platform)
     const command = process.platform === 'win32' ? 'where ngrok' : 'which ngrok';
     execSync(command, { stdio: 'ignore' });
+    
+    // Then verify ngrok actually works by running it
+    try {
+      execSync('ngrok version', { stdio: 'pipe', timeout: 3000 });
+    } catch {
+      // If ngrok version fails, it means ngrok is not properly installed
+      return { installed: false, hasToken: false };
+    }
     
     // Check if ngrok token is configured
     let hasToken = false;
     try {
-      const output = execSync('ngrok config check', { stdio: 'pipe', encoding: 'utf-8' });
+      const output = execSync('ngrok config check', { stdio: 'pipe', encoding: 'utf-8', timeout: 3000 });
       hasToken = !output.includes('not found') && !output.includes('invalid');
     } catch {
       hasToken = false;
