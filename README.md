@@ -147,6 +147,7 @@ your-bot/
 
 ## 📚 Documentation
 
+- [🌐 Laiyon Website](https://laiyon.pro) - Official website and documentation
 - [BuilderBot Documentation](https://builderbot.vercel.app/)
 - [Ngrok Documentation](https://ngrok.com/docs)
 
