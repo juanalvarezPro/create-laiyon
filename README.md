@@ -19,9 +19,14 @@ Create professional WhatsApp bots with ease using the power of BuilderBot and Wa
 ## 🚀 Quick Start
 
 ```bash
-npm create @laiyon/wasapi my-bot
+# With project name (recommended)
+npm create @laiyon/wasapi@latest my-bot
 
-npx @laiyon/create-wasapi my-bot
+# Interactive mode
+npm create @laiyon/wasapi@latest
+
+# Alternative with npx
+npx @laiyon/create-wasapi@latest my-bot
 ```
 
 That's it! The CLI will guide you through the entire setup process.
