@@ -29,12 +29,14 @@ describe('systemDetector', () => {
       // Mock successful ngrok detection
       mockExecSync
         .mockReturnValueOnce('') // where ngrok succeeds
+        .mockReturnValueOnce('ngrok version 3.x.x') // ngrok version succeeds
         .mockReturnValueOnce('Valid configuration'); // config check succeeds
       
       const result = await checkNgrokInstalled();
       
       expect(result).toEqual({ installed: true, hasToken: true });
       expect(mockExecSync).toHaveBeenCalledWith('where ngrok', { stdio: 'ignore' });
+      expect(mockExecSync).toHaveBeenCalledWith('ngrok version', { stdio: 'pipe', timeout: 3000 });
       
       Object.defineProperty(process, 'platform', { value: originalPlatform });
     });
@@ -45,12 +47,14 @@ describe('systemDetector', () => {
       
       mockExecSync
         .mockReturnValueOnce('') // which ngrok succeeds
+        .mockReturnValueOnce('ngrok version 3.x.x') // ngrok version succeeds
         .mockReturnValueOnce('Valid configuration'); // config check succeeds
       
       const result = await checkNgrokInstalled();
       
       expect(result).toEqual({ installed: true, hasToken: true });
       expect(mockExecSync).toHaveBeenCalledWith('which ngrok', { stdio: 'ignore' });
+      expect(mockExecSync).toHaveBeenCalledWith('ngrok version', { stdio: 'pipe', timeout: 3000 });
       
       Object.defineProperty(process, 'platform', { value: originalPlatform });
     });
@@ -67,7 +71,8 @@ describe('systemDetector', () => {
 
     it('should detect when ngrok is installed but no token', async () => {
       mockExecSync
-        .mockReturnValueOnce('') // ngrok exists
+        .mockReturnValueOnce('') // ngrok exists (which/where command)
+        .mockReturnValueOnce('ngrok version 3.x.x') // ngrok version succeeds
         .mockImplementation(() => {
           throw new Error('No token found');
         }); // config check fails
@@ -75,6 +80,18 @@ describe('systemDetector', () => {
       const result = await checkNgrokInstalled();
       
       expect(result).toEqual({ installed: true, hasToken: false });
+    });
+
+    it('should detect when ngrok command exists but is broken', async () => {
+      mockExecSync
+        .mockReturnValueOnce('') // which/where ngrok succeeds
+        .mockImplementation(() => {
+          throw new Error('ngrok version failed');
+        }); // but ngrok version fails
+      
+      const result = await checkNgrokInstalled();
+      
+      expect(result).toEqual({ installed: false, hasToken: false });
     });
   });
 
@@ -85,6 +102,7 @@ describe('systemDetector', () => {
       
       mockExecSync
         .mockReturnValueOnce('') // ngrok exists
+        .mockReturnValueOnce('ngrok version 3.x.x') // ngrok version works
         .mockReturnValueOnce('Valid configuration'); // has token
       
       const result = await detectSystemConfig();
@@ -121,6 +139,7 @@ describe('systemDetector', () => {
       
       mockExecSync
         .mockReturnValueOnce('') // ngrok exists
+        .mockReturnValueOnce('ngrok version 3.x.x') // ngrok version works
         .mockImplementation(() => {
           throw new Error('No token');
         }); // no token
