@@ -17,10 +17,18 @@ async function connectWasapi(): Promise<{ apiKey: string; connected: boolean }> 
     ]);
 
     apiKey = enteredKey;
+    
+    // Reset singleton before creating new client instance for retry attempts
+    if (attempts > 0) {
+      const tempClient = new WasapiClient("");
+      tempClient.resetClient();
+    }
+    
     const client = new WasapiClient(apiKey);
 
     try {
       const numbers = await client.whatsapp.getWhatsappNumbers();
+      
       if (numbers.success) {
         connected = true;
       } else {
