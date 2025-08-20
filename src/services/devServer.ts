@@ -125,7 +125,7 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
       
       devProcess = spawn('npm', ['run', 'dev'], {
         cwd: projectPath,
-        stdio: 'pipe',
+        stdio: 'inherit', // Cambiar a 'inherit' para mostrar logs en tiempo real
         env: { ...process.env, PORT: port.toString() }
       });
       
