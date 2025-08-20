@@ -1,17 +1,17 @@
 import dotenv from "dotenv";
 import { createBot, createFlow, createProvider, addKeyword } from '@builderbot/bot'
 import { WasapiProvider as Provider } from "@laiyon/wasapi-provider";
-import { JsonDB as Database } from '@builderbot/database-json';
+import { JsonFileDB } from '@builderbot/database-json';
 
 dotenv.config();
-
+export type IDatabase = typeof JsonFileDB
 // Environment variables configuration
 const port = process.env.PORT || 4000;
 const token = process.env.API_KEY
 const deviceId = process.env.PHONE_ID
 
 // Welcome flow - Main entry point
-const flowWelcome = addKeyword<Provider, Database>(['hello', 'hi', 'start', 'menu'])
+const flowWelcome = addKeyword<Provider, IDatabase>(['hello', 'hi', 'start', 'menu'])
   .addAnswer('🤖 Hello! I am Laiyon Wasapi Bot')
   .addAnswer([
     'Welcome! I can help you with:',
@@ -25,7 +25,7 @@ const flowWelcome = addKeyword<Provider, Database>(['hello', 'hi', 'start', 'men
   ]);
 
 // Services information flow
-const flowServices = addKeyword<Provider, Database>(['1', 'services', 'info'])
+const flowServices = addKeyword<Provider, IDatabase>(['1', 'services', 'info'])
   .addAnswer([
     '📋 Our Services:',
     '',
@@ -39,7 +39,7 @@ const flowServices = addKeyword<Provider, Database>(['1', 'services', 'info'])
   ]);
 
 // Support flow
-const flowSupport = addKeyword<Provider, Database>(['2', 'support', 'help'])
+const flowSupport = addKeyword<Provider, IDatabase>(['2', 'support', 'help'])
   .addAnswer([
     '🆘 Support Options:',
     '',
@@ -52,7 +52,7 @@ const flowSupport = addKeyword<Provider, Database>(['2', 'support', 'help'])
   ]);
 
 // Contact information flow
-const flowContact = addKeyword<Provider, Database>(['3', 'contact', 'info contact'])
+const flowContact = addKeyword<Provider, IDatabase>(['3', 'contact', 'info contact'])
   .addAnswer([
     '📞 Contact Information:',
     '',
@@ -66,7 +66,7 @@ const flowContact = addKeyword<Provider, Database>(['3', 'contact', 'info contac
   ]);
 
 // FAQ flow
-const flowFAQ = addKeyword<Provider, Database>(['4', 'faq', 'questions'])
+const flowFAQ = addKeyword<Provider, IDatabase>(['4', 'faq', 'questions'])
   .addAnswer([
     '❓ Frequently Asked Questions:',
     '',
@@ -83,7 +83,7 @@ const flowFAQ = addKeyword<Provider, Database>(['4', 'faq', 'questions'])
   ]);
 
 // Interactive flow with dynamic responses
-const flowInteractive = addKeyword<Provider, Database>(['demo', 'test', 'interactive'])
+const flowInteractive = addKeyword<Provider, IDatabase>(['demo', 'test', 'interactive'])
   .addAnswer('🎮 Interactive Demo Mode!')
   .addAction(async (ctx, { flowDynamic, provider }) => {
     const userName = ctx.name || 'Friend';
@@ -101,7 +101,7 @@ const flowInteractive = addKeyword<Provider, Database>(['demo', 'test', 'interac
   .addAnswer('Type "menu" to return to main options');
 
 // Fallback flow for unrecognized messages
-const flowFallback = addKeyword<Provider, Database>([''])
+const flowFallback = addKeyword<Provider, IDatabase>([''])
   .addAnswer([
     '🤔 I didn\'t understand that.',
     '',
@@ -132,7 +132,7 @@ const main = async () => {
 
   // Create provider and database adapters
   const adapterProvider = createProvider(Provider, { token, deviceId })
-  const adapterDB = new Database({ filename: 'db.json' })
+  const adapterDB = new JsonFileDB({ filename: 'db.json' })
 
   // Create and start the bot
   const { httpServer } = await createBot({
