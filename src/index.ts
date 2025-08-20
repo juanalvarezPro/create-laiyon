@@ -11,6 +11,7 @@ import { startDevServerWithNgrok } from "./services/devServer.js";
 import { showManualInstructions } from "./ui/instructions.js";
 import { askForGitHubStar } from "./ui/githubStar.js";
 import ora from "ora";
+import chalk from "chalk";
 
 async function main() {
   try {
@@ -30,7 +31,11 @@ async function main() {
         console.error("❌ Project name can only contain letters, numbers, hyphens, and underscores");
         process.exit(1);
       }
-      console.log(`✅ Creating project: ${projectNameFromArgs}`);
+      console.log("");
+      console.log(chalk.bgGreen.black(" ✨ PROJECT SETUP "));
+      console.log("");
+      console.log(chalk.green(`   Creating project: ${chalk.bold(projectNameFromArgs)}`));
+      console.log("");
     }
     
     const answers = await runPrompts(projectNameFromArgs);
@@ -45,9 +50,11 @@ async function main() {
     const spinner = ora("📦 Installing template...").start();
     
     await installTemplate(answers.projectName, answers.dbType);
-    spinner.succeed("✅ Template installed correctly");
+    spinner.succeed(chalk.green("✅ Template installed successfully"));
 
-    console.log(`\n🔧 Configuring environment variables...`);
+    console.log("");
+    console.log(chalk.bgBlue.white(" 🔧 ENVIRONMENT SETUP "));
+    console.log("");
     
     const selectedPhone = await selectPhone();
     if (!selectedPhone) {
@@ -78,8 +85,6 @@ async function main() {
     const wantsAutoSetup = await askForAutomaticSetup(canAutoSetup);
 
     if (canAutoSetup && wantsAutoSetup) {
-      console.log("\n🚀 Starting automatic setup...");
-      console.log("🔧 Installing packages and starting development server...");
       
       try {
         await startDevServerWithNgrok(answers.projectName, phoneNumber);
@@ -101,8 +106,7 @@ async function main() {
     // Ask for GitHub star at the end (only for manual setup)
     await askForGitHubStar();
     
-    console.log("\n🎉 Congratulations! Your WhatsApp bot is ready!");
-    console.log("Thank you for using create-laiyon");
+
     
     // Exit cleanly to stop any background processes
     setTimeout(() => {
