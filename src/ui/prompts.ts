@@ -9,7 +9,6 @@ const DATABASE_CHOICES = [
     {
         name: "Json",
         value: "base-ts-wasapi-json",
-        disabled: "(Coming Soon)"
     },
     {
         name: "MongoDB",
