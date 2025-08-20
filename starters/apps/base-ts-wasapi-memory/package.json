@@ -1,5 +1,5 @@
 {
-  "name": "base-bailey-json",
+  "name": "base-wasapi-memory",
   "version": "1.0.2",
   "description": "",
   "main": "dist/app.js",
