@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { createBot, createFlow, createProvider, addKeyword } from '@builderbot/bot'
-import { WasapiProvider as Provider, WasapiEvents } from "@laiyon/wasapi-provider";
+import { WasapiProvider as Provider } from "@laiyon/wasapi-provider";
 import { MemoryDB as Database } from '@builderbot/bot'
 
 dotenv.config();
@@ -113,8 +113,6 @@ const flowFallback = addKeyword<Provider, Database>([''])
     'Or simply describe what you need!'
   ]);
 
-
-
 const main = async () => {
   // Create flow with all conversation flows
   const adapterFlow = createFlow([
@@ -136,19 +134,6 @@ const main = async () => {
   const adapterProvider = createProvider(Provider, { token, deviceId })
   const adapterDB = new Database()
 
-  // CREATE WASAPI EVENTS INSTANCE TO INTERCEPT MESSAGES
-  const wasapiEvents = new WasapiEvents(token);
-
-  // Listen for message events
-  wasapiEvents.on('message', (message) => {
-    console.log('📨 [WASAPI] Incoming message:', {
-      from: message.from,
-      body: message.body,
-      name: message.name,
-      timestamp: new Date().toISOString()
-    });
-  });
-
   // Create and start the bot
   const { httpServer } = await createBot({
     flow: adapterFlow,
@@ -158,8 +143,7 @@ const main = async () => {
 
   // Start HTTP server
   httpServer(Number(port))
-  console.log(`🤖 Laiyon Wasapi Bot started`)
-  console.log('📡 [WASAPI] Provider listening for events...')
+  console.log(`🤖 Laiyon Wasapi Bot started on port ${port}`)
 }
 
 main()
