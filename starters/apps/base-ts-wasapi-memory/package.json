@@ -13,7 +13,7 @@
   "keywords": [],
   "dependencies": {
     "@builderbot/bot": "1.2.9",
-    "@laiyon/wasapi-provider": "^0.1.2",
+    "@laiyon/wasapi-provider": "^0.1.3",
     "dotenv": "^17.2.1"
   },
   "devDependencies": {
