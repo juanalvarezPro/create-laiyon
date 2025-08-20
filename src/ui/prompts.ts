@@ -1,46 +1,63 @@
 import inquirer from "inquirer";
 
-export async function runPrompts() {
-    return await inquirer.prompt([
-        {
-            type: "input",
-            name: "projectName",
-            message: "Project name:",
-            default: "wasabot-app"
-        },
-        {
-            type: "list",
-            name: "dbType",
-            message: "Which database do you want to use?",
-            choices: [
-                {
-                    name: "Memory",
-                    value: "base-ts-wasapi-memory"
-                },
-                {
-                    name: "Json",
-                    value: "base-ts-wasapi-json",
-                    disabled: "(Coming Soon)"
-                },
-                {
-                    name: "MongoDB",
-                    value: "base-ts-wasapi-mongo",
-                    disabled: "(Coming Soon)"
-                },
-                {
-                    name: "MySQL",
-                    value: "base-ts-wasapi-mysql", 
-                    disabled: "(Coming Soon)"
-                },
-                {
-                    name: "PostgreSQL",
-                    value: "base-ts-wasapi-postgresql",
-                    disabled: "(Coming Soon)"
-                }
-            ],
-            default: "base-ts-wasapi-memory"
-        }
-    ]);
+// Database choices (DRY principle)
+const DATABASE_CHOICES = [
+    {
+        name: "Memory",
+        value: "base-ts-wasapi-memory"
+    },
+    {
+        name: "Json",
+        value: "base-ts-wasapi-json",
+        disabled: "(Coming Soon)"
+    },
+    {
+        name: "MongoDB",
+        value: "base-ts-wasapi-mongo",
+        disabled: "(Coming Soon)"
+    },
+    {
+        name: "MySQL",
+        value: "base-ts-wasapi-mysql", 
+        disabled: "(Coming Soon)"
+    },
+    {
+        name: "PostgreSQL",
+        value: "base-ts-wasapi-postgresql",
+        disabled: "(Coming Soon)"
+    }
+];
+
+// Project name question
+const PROJECT_NAME_QUESTION = {
+    type: "input",
+    name: "projectName",
+    message: "Project name:",
+    default: "wasabot-app"
+} as const;
+
+// Database question
+const DATABASE_QUESTION = {
+    type: "list",
+    name: "dbType",
+    message: "Which database do you want to use?",
+    choices: DATABASE_CHOICES,
+    default: "base-ts-wasapi-memory"
+} as const;
+
+export async function runPrompts(projectNameFromArgs?: string) {
+    // If project name provided via CLI, only ask for database
+    if (projectNameFromArgs) {
+        const dbAnswer = await inquirer.prompt([DATABASE_QUESTION]);
+        
+        return {
+            projectName: projectNameFromArgs,
+            dbType: dbAnswer.dbType
+        };
+    } else {
+        // Ask for both project name and database
+        return await inquirer.prompt([PROJECT_NAME_QUESTION, DATABASE_QUESTION]);
+    }
 }
 
 export async function askForAutomaticSetup(canAutoSetup: boolean): Promise<boolean> {

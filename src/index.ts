@@ -20,7 +20,20 @@ async function main() {
     // Check Node.js version first
     checkNodeVersion();
     
-    const answers = await runPrompts();
+    // Get project name from command line arguments if provided
+    const projectNameFromArgs = process.argv[2];
+    
+    // Validate project name if provided via command line
+    if (projectNameFromArgs) {
+      // Basic validation for project name
+      if (!/^[a-zA-Z0-9_-]+$/.test(projectNameFromArgs)) {
+        console.error("❌ Project name can only contain letters, numbers, hyphens, and underscores");
+        process.exit(1);
+      }
+      console.log(`✅ Creating project: ${projectNameFromArgs}`);
+    }
+    
+    const answers = await runPrompts(projectNameFromArgs);
 
     // Validate the selected template
     if (!validateTemplate(answers.dbType)) {
