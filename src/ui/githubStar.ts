@@ -2,22 +2,30 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 
 export async function askForGitHubStar() {
-  console.log(chalk.green("\n🎉 Congratulations! Your WhatsApp bot is ready!"));
+  console.log("");
+  console.log(chalk.bgGreen.black(" 🎉 CONGRATULATIONS! "));
+  console.log("");
+  console.log(chalk.green("✅ Your WhatsApp bot is ready!"));
   console.log(chalk.gray("   Thank you for using create-laiyon"));
+  console.log("");
   
   const { wantsStar } = await inquirer.prompt([
     {
       type: "confirm",
-      name: "wantsStar",
-      message: "⭐ Would you like to give us a star on GitHub? It helps us a lot!",
+      name: "wantsStar", 
+      message: chalk.yellow("⭐ Would you like to give us a star on GitHub? It helps us a lot!"),
       default: true
     }
   ]);
 
   if (wantsStar) {
-    console.log(chalk.green("\n🙏 Thank you so much! Opening GitHub..."));
-    console.log(chalk.blue("   🔗 https://github.com/juanalvarezPro/create-laiyon"));
+    console.log("");
+    console.log(chalk.bgYellow.black(" 🙏 THANK YOU! "));
+    console.log("");
+    console.log(chalk.green("✨ Opening GitHub..."));
+    console.log(chalk.blue.bold("🔗 https://github.com/juanalvarezPro/create-laiyon"));
     console.log(chalk.gray("   Or search for 'create-laiyon' on GitHub"));
+    console.log("");
     
     // Try to open the URL automatically
     try {
@@ -33,9 +41,14 @@ export async function askForGitHubStar() {
       console.log(chalk.yellow("   💡 Please visit the link manually"));
     }
   } else {
-    console.log(chalk.yellow("\n💛 No problem! Maybe next time 😊"));
-    console.log(chalk.gray("   We're always here to help you build amazing bots!"));
+    console.log("");
+    console.log(chalk.bgBlue.white(" 💙 NO PROBLEM! "));
+    console.log("");
+    console.log(chalk.blue("Maybe next time! We're always here to help 😊"));
+    console.log(chalk.gray("Build amazing WhatsApp bots with ease!"));
+    console.log("");
   }
   
-  console.log(chalk.green("\n🚀 Happy bot building! 🤖\n"));
+  console.log(chalk.bgMagenta.white(" 🚀 HAPPY BOT BUILDING! 🤖 "));
+  console.log("");
 }

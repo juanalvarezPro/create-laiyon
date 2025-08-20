@@ -1,5 +1,6 @@
 import ngrok from "ngrok";
 import qrcode from "qrcode-terminal";
+import chalk from "chalk";
 import { getFreePort } from "../utils/portUtils.js";
 
 
@@ -10,14 +11,18 @@ export async function startNgrok(projectName: string, port?: number, phoneNumber
     
     // Start ngrok directly - let it handle multiple tunnel limitations
     
-    console.log(`🔌 Connecting ngrok to port ${targetPort}...`);
     const url = await ngrok.connect({ addr: targetPort });
     
     // Generate webhook URL
     const webhookUrl = `${url}/webhook/wasapi`;
     
-    console.log(`🔗 Webhook URL: ${webhookUrl}`);
-    console.log(`   Use this URL in your Wasapi configuration`);
+    console.log("");
+    console.log(chalk.bgGreen.black(" ✅ NGROK TUNNEL ACTIVE "));
+    console.log("");
+    console.log(chalk.green.bold("📍 Webhook URL:"));
+    console.log(chalk.cyan(`   ${webhookUrl}`));
+    console.log(chalk.gray("   → Use this URL in your Wasapi configuration"));
+    console.log("");
     
     // Generate wa.me QR if phone number is provided
     if (phoneNumber) {
@@ -47,12 +52,14 @@ async function generateWaMeQR(phoneNumber: string) {
     // Generate wa.me link with predefined message
     const waMeLink = `https://wa.me/${cleanPhoneNumber}?text=test`;
     
-    console.log(`\n📱 Test your bot by scanning this QR:`);
+    console.log(chalk.bgBlue.white(" 📱 TEST YOUR BOT "));
+    console.log("");
     qrcode.generate(waMeLink, { small: true });
     
-    console.log(`\n🔗 Or click this link directly:`);
-    console.log(`   ${waMeLink}`);
-    console.log(`\n💡 Tip: Ctrl+Click (Cmd+Click on Mac) to open in your browser`);
+    console.log(chalk.blue.bold("🔗 Or click this link:"));
+    console.log(chalk.cyan(`   ${waMeLink}`));
+    console.log(chalk.gray("   💡 Ctrl+Click (Cmd+Click on Mac) to open"));
+    console.log("");
     
   } catch (error) {
     console.warn(`⚠️ Could not generate wa.me QR: ${error}`);

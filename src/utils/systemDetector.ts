@@ -1,3 +1,5 @@
+import chalk from "chalk";
+
 // Function to check if ngrok is installed and configured
 export async function checkNgrokInstalled(): Promise<{ installed: boolean; hasToken: boolean }> {
   try {
@@ -32,8 +34,6 @@ export async function checkNgrokInstalled(): Promise<{ installed: boolean; hasTo
 
 // Function to detect system configuration
 export async function detectSystemConfig() {
-  console.log("\n🔍 Detecting system configuration...");
-  
   const platform = process.platform;
   const platformName = platform === 'darwin' ? '🍎 macOS' : 
                       platform === 'win32' ? '🪟 Windows' : 
@@ -42,10 +42,12 @@ export async function detectSystemConfig() {
   
   const ngrokStatus = await checkNgrokInstalled();
   
-  console.log(`   Platform: ${platformName}`);
-  console.log(`   Ngrok: ${ngrokStatus.installed ? (ngrokStatus.hasToken ? '✅ Ready' : '⚠️ Needs token') : '❌ Not installed'}`);
-  
-  console.log(""); // Add extra spacing
+  console.log("");
+  console.log(chalk.bgGray.white(" 🔍 SYSTEM DETECTION "));
+  console.log("");
+  console.log(chalk.blue(`   Platform: ${platformName}`));
+  console.log(chalk.blue(`   Ngrok: ${ngrokStatus.installed ? (ngrokStatus.hasToken ? '✅ Ready' : '⚠️ Needs token') : '❌ Not installed'}`));
+  console.log("");
 
   return { 
     platform, 

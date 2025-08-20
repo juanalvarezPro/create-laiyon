@@ -1,19 +1,53 @@
+import chalk from "chalk";
+
 // Function to show manual instructions
 export async function showManualInstructions(projectName: string, systemConfig: any) {
-  console.log("\n🎉 Project created successfully!");
-  console.log(`\n📋 Manual setup instructions:`);
-  console.log(`   1. cd ${projectName}`);
-  console.log(`   2. npm install`);
-  console.log(`   3. npm run dev`);
+  console.log("");
+  console.log(chalk.bgGreen.black(" 🎉 PROJECT CREATED "));
+  console.log("");
+  console.log(chalk.green("✅ Your project is ready for manual setup!"));
+  console.log("");
   
+  console.log(chalk.bgBlue.white(" 📋 SETUP INSTRUCTIONS "));
+  console.log("");
+  console.log(chalk.blue.bold("📁 Navigate to your project:"));
+  console.log(chalk.cyan(`   cd ${projectName}`));
+  console.log("");
+  
+  console.log(chalk.blue.bold("📦 Install dependencies:"));
+  console.log(chalk.cyan("   npm install"));
+  console.log("");
+  
+  console.log(chalk.blue.bold("🚀 Start development server:"));
+  console.log(chalk.cyan("   npm run dev"));
+  console.log("");
+  
+  console.log(chalk.blue.bold("🌐 Setup ngrok tunnel:"));
   if (!systemConfig.ngrokInstalled) {
-    console.log(`   4. Install ngrok: https://ngrok.com/download`);
-    console.log(`   5. Configure ngrok token: ngrok config add-authtoken <your-token>`);
-    console.log(`   6. Run: ngrok http <port> (where <port> is the port your app runs on)`);
+    console.log(chalk.yellow("   → First install ngrok:"));
+    console.log(chalk.cyan("     https://ngrok.com/download"));
+    console.log("");
+    console.log(chalk.yellow("   → Configure your token:"));
+    console.log(chalk.cyan("     ngrok config add-authtoken <your-token>"));
+    console.log("");
+    console.log(chalk.yellow("   → Create tunnel (in another terminal):"));
+    console.log(chalk.cyan("     ngrok http <port>"));
   } else if (!systemConfig.ngrokHasToken) {
-    console.log(`   4. Configure ngrok token: ngrok config add-authtoken <your-token>`);
-    console.log(`   5. Run: ngrok http <port>`);
+    console.log(chalk.yellow("   → Configure your token:"));
+    console.log(chalk.cyan("     ngrok config add-authtoken <your-token>"));
+    console.log("");
+    console.log(chalk.yellow("   → Create tunnel (in another terminal):"));
+    console.log(chalk.cyan("     ngrok http <port>"));
   } else {
-    console.log(`   4. In another terminal: ngrok http <port>`);
+    console.log(chalk.yellow("   → In another terminal:"));
+    console.log(chalk.cyan("     ngrok http <port>"));
   }
+  
+  console.log("");
+  console.log(chalk.bgYellow.black(" 💡 HELPFUL TIPS "));
+  console.log("");
+  console.log(chalk.gray("• The default port is usually 3000"));
+  console.log(chalk.gray("• Copy the ngrok URL and use it in your Wasapi webhook"));
+  console.log(chalk.gray("• Add '/webhook/wasapi' to your ngrok URL"));
+  console.log("");
 }

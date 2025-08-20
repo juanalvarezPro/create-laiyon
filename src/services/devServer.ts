@@ -1,6 +1,8 @@
 import { startNgrok } from "./ngrokService.js";
 import { getFreePort } from "../utils/portUtils.js";
 import { promises as fs } from "fs";
+import chalk from "chalk";
+import ora from "ora";
 
 // Function to kill process and all its children
 async function killProcessTree(process: any): Promise<void> {
@@ -100,38 +102,49 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
   try {
     const projectPath = path.join(process.cwd(), projectName);
     
-    // Install packages
-    console.log("📦 Installing npm packages...");
-    execSync('npm install', { cwd: projectPath, stdio: 'inherit' });
+    console.log("");
+    console.log(chalk.bgBlue.white(" 🚀 AUTOMATIC SETUP "));
+    console.log("");
     
-    // Find available port
-    const port = await getFreePort(3000);
-    console.log(`🚀 Starting development server on port ${port}...`);
-    
-    // Save port to .env file
-    await updateEnvWithPort(projectName, port);
-    
-    // Run npm run dev
-    devProcess = spawn('npm', ['run', 'dev'], {
-      cwd: projectPath,
-      stdio: 'pipe',
-      env: { ...process.env, PORT: port.toString() }
-    });
-    
-    // Wait for the server to start and verify it's running
-    console.log("⏳ Waiting for server to start...");
-    const serverStarted = await waitForServer(port);
-    
-    if (!serverStarted) {
-      console.error(`❌ Server failed to start on port ${port}`);
-      devProcess.kill();
-      throw new Error("Development server failed to start");
+    // Install packages with spinner
+    const installSpinner = ora("📦 Installing packages...").start();
+    try {
+      execSync('npm install', { cwd: projectPath, stdio: 'pipe' });
+      installSpinner.succeed(chalk.green("📦 Packages installed"));
+    } catch (error) {
+      installSpinner.fail(chalk.red("❌ Package installation failed"));
+      throw new Error("Failed to install packages");
     }
     
-    console.log(`✅ Server running on port ${port}`);
+    // Start server with spinner
+    const serverSpinner = ora("🚀 Starting development server...").start();
+    let port: number;
+    try {
+      port = await getFreePort(3000);
+      await updateEnvWithPort(projectName, port);
+      
+      devProcess = spawn('npm', ['run', 'dev'], {
+        cwd: projectPath,
+        stdio: 'pipe',
+        env: { ...process.env, PORT: port.toString() }
+      });
+      
+      const serverStarted = await waitForServer(port);
+      
+      if (!serverStarted) {
+        serverSpinner.fail(chalk.red("❌ Server failed to start"));
+        devProcess.kill();
+        throw new Error("Development server failed to start");
+      }
+      
+      serverSpinner.succeed(chalk.green(`🚀 Server running on port ${port}`));
+    } catch (error) {
+      serverSpinner.fail(chalk.red("❌ Server startup failed"));
+      throw error;
+    }
     
-    // Start ngrok with timeout
-    console.log("🌐 Starting ngrok tunnel...");
+    // Create ngrok tunnel with spinner
+    const ngrokSpinner = ora("🌐 Creating ngrok tunnel...").start();
     try {
       await Promise.race([
         startNgrok(projectName, port, phoneNumber),
@@ -140,16 +153,23 @@ export async function startDevServerWithNgrok(projectName: string, phoneNumber: 
         )
       ]);
       
+      ngrokSpinner.succeed(chalk.green("🌐 Ngrok tunnel active"));
+      
       // ✅ SUCCESS: Ngrok connected successfully
-      console.log("\n🎉 Setup completed successfully!");
-      console.log(`🤖 Your bot is now running and accessible via ngrok!`);
-      console.log(`\n💡 Note: Keep this terminal open to maintain the connection.`);
-      console.log(`📋 To stop: Press Ctrl+C`);
+      console.log("");
+      console.log(chalk.bgGreen.black(" 🎉 SETUP COMPLETE "));
+      console.log("");
+      console.log(chalk.green("🤖 Your bot is live and ready!"));
+      console.log("");
+      console.log(chalk.yellow("💡 Keep this terminal open"));
+      console.log(chalk.gray("📋 Press Ctrl+C to stop"));
       
       // Don't kill the server - let it run!
       // The CLI will exit but the server stays alive
       
     } catch (ngrokError: any) {
+      ngrokSpinner.fail(chalk.red("❌ Ngrok tunnel failed"));
+      console.error(chalk.red(`   Error: ${ngrokError.message}`));
       // Kill development server and all child processes
       await killProcessTree(devProcess);
       throw ngrokError;
