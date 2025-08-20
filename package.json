@@ -37,7 +37,8 @@
   "files": [
     "dist/",
     "bin/",
-    "starters/",
+    "starters/apps/base-ts-wasapi-json/",
+    "starters/apps/base-ts-wasapi-memory/",
     "README.md"
   ],
   "dependencies": {
