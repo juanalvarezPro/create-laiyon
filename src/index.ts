@@ -1,117 +1,54 @@
 #!/usr/bin/env node
-import { runPrompts, askForAutomaticSetup } from "./ui/prompts.js";
 import { showBanner } from "./ui/banner.js";
-import { setupEnv } from "./setupEnv.js";
-import { installTemplate } from "./templates/templateInstaller.js";
-import { validateTemplate} from "./templates/templateConfig.js";
-import { selectPhone } from "./services/phoneSelector.js";
-import { detectSystemConfig, setupNgrokToken } from "./utils/systemDetector.js";
 import { checkNodeVersion } from "./utils/nodeVersionChecker.js";
-import { startDevServerWithNgrok } from "./services/devServer.js";
-import { showManualInstructions } from "./ui/instructions.js";
-import { askForGitHubStar } from "./ui/githubStar.js";
-import ora from "ora";
-import chalk from "chalk";
+import { ProjectSetupService } from "./services/ProjectSetupService.js";
+import { TemplateInstallationService } from "./services/TemplateInstallationService.js";
+import { AutomaticSetupService } from "./services/AutomaticSetupService.js";
 
 async function main() {
   try {
-    // Show awesome banner
+    // STEP 1: Show laiyon banner
     showBanner();
 
-    // Check Node.js version first
+    // STEP 2: Check Node.js compatibility (silent check)
     checkNodeVersion();
     
     // Get project name from command line arguments if provided
     const projectNameFromArgs = process.argv[2];
     
-    // Validate project name if provided via command line
-    if (projectNameFromArgs) {
-      // Basic validation for project name
-      if (!/^[a-zA-Z0-9_-]+$/.test(projectNameFromArgs)) {
-        console.error("❌ Project name can only contain letters, numbers, hyphens, and underscores");
-        process.exit(1);
-      }
-      console.log("");
-      console.log(chalk.bgGreen.black(" ✨ PROJECT SETUP "));
-      console.log("");
-      console.log(chalk.green(`   Creating project: ${chalk.bold(projectNameFromArgs)}`));
-      console.log("");
+    // STEP 3-5: Setup project (name, WhatsApp configuration, database)
+    const projectSetup = await ProjectSetupService.setupProject(projectNameFromArgs);
+    
+    // Install and configure template
+    const installationResult = await TemplateInstallationService.installTemplate(
+      projectSetup.projectName,
+      projectSetup.dbType,
+      projectSetup.apiKey,
+      projectSetup.phone,
+      projectSetup.dbConfig
+    );
+    
+    if (!installationResult.success) {
+      throw new Error(`Template installation failed: ${installationResult.error}`);
     }
     
-    const answers = await runPrompts(projectNameFromArgs);
-
-    // Validate the selected template
-    if (!validateTemplate(answers.dbType)) {
-      console.error(`❌ Template "${answers.dbType}" is not valid`);
-      process.exit(1);
+    // Handle automatic setup
+    const autoSetupResult = await AutomaticSetupService.handleAutomaticSetup(
+      projectSetup.projectName,
+      projectSetup.phoneNumber,
+      projectSetup.databaseConnectionFailed
+    );
+    
+    if (!autoSetupResult.success) {
+      throw new Error(`Automatic setup failed: ${autoSetupResult.error}`);
     }
-
-
-    const spinner = ora("📦 Installing template...").start();
-    
-    await installTemplate(answers.projectName, answers.dbType);
-    spinner.succeed(chalk.green("✅ Template installed successfully"));
-
-    console.log("");
-    console.log(chalk.bgBlue.white(" 🔧 ENVIRONMENT SETUP "));
-    console.log("");
-    
-    const selectedPhone = await selectPhone();
-    if (!selectedPhone) {
-      console.error("\n❌ No phone selected");
-      process.exit(1);
-    }
-    
-    const { phone, phoneNumber, apiKey } = selectedPhone;
-    console.log(`\n✅ Phone selected: ${phoneNumber}`);
-    
-    await setupEnv(answers.projectName, {
-      API_KEY: apiKey,
-      PHONE_ID: phone
-    });
-
-    // Detect system configuration
-    const systemConfig = await detectSystemConfig();
-
-    // Ask user if they want automatic setup (only if ngrok is available)
-    let canAutoSetup = systemConfig.canAutoSetup;
-    
-    // If ngrok is installed but no token, offer to configure it
-    if (systemConfig.ngrokInstalled && !systemConfig.ngrokHasToken) {
-      const tokenConfigured = await setupNgrokToken();
-      canAutoSetup = tokenConfigured;
-    }
-    
-    const wantsAutoSetup = await askForAutomaticSetup(canAutoSetup);
-
-    if (canAutoSetup && wantsAutoSetup) {
-      
-      try {
-        await startDevServerWithNgrok(answers.projectName, phoneNumber);
-        // ✅ SUCCESS: Server is running with ngrok
-        // Don't show GitHub star or exit - let server run
-        return; // Exit main function, keep server alive
-        
-      } catch (autoSetupError) {
-        console.log("\n⚠️ Automatic setup failed, showing manual instructions:");
-        await showManualInstructions(answers.projectName, systemConfig);
-      }
-    } else {
-      if (canAutoSetup && !wantsAutoSetup) {
-        console.log("\n👤 User chose manual setup");
-      }
-      await showManualInstructions(answers.projectName, systemConfig);
-    }
-
-    // Ask for GitHub star at the end (only for manual setup)
-    await askForGitHubStar();
-    
-
     
     // Exit cleanly to stop any background processes
-    setTimeout(() => {
-      process.exit(0);
-    }, 1000);
+    if (!autoSetupResult.serverRunning) {
+      setTimeout(() => {
+        process.exit(0);
+      }, 1000);
+    }
     
   } catch (error) {
     console.error(`\n❌ Error during project creation: ${error}`);
