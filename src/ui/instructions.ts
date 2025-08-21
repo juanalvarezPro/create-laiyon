@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 // Function to show manual instructions
-export async function showManualInstructions(projectName: string, systemConfig: any) {
+export async function showManualInstructions(projectName: string, systemConfig: any, databaseFailed: boolean = false) {
   console.log("");
   console.log(chalk.bgGreen.black(" 🎉 PROJECT CREATED "));
   console.log("");
@@ -10,6 +10,21 @@ export async function showManualInstructions(projectName: string, systemConfig: 
   
   console.log(chalk.bgBlue.white(" 📋 SETUP INSTRUCTIONS "));
   console.log("");
+  
+  if (databaseFailed) {
+    console.log(chalk.bgRed.white(" ⚠️ DATABASE CONNECTION ISSUE "));
+    console.log("");
+    console.log(chalk.red("The database connection failed during setup. You'll need to:"));
+    console.log("");
+    console.log(chalk.yellow("1. Check your database server is running"));
+    console.log(chalk.yellow("2. Verify connection details in your .env file"));
+    console.log(chalk.yellow("3. Ensure database exists and user has proper permissions"));
+    console.log("");
+    console.log(chalk.cyan("Your .env file contains the database configuration you entered."));
+    console.log(chalk.cyan("After fixing the database connection, restart the bot with: npm run dev"));
+    console.log("");
+  }
+  
   console.log(chalk.blue.bold("📁 Navigate to your project:"));
   console.log(chalk.cyan(`   cd ${projectName}`));
   console.log("");
