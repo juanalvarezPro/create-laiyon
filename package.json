@@ -39,6 +39,7 @@
     "bin/",
     "starters/apps/base-ts-wasapi-json/",
     "starters/apps/base-ts-wasapi-memory/",
+    "starters/apps/base-ts-wasapi-mysql/",
     "README.md"
   ],
   "dependencies": {
